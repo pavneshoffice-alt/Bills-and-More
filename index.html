@@ -217,7 +217,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        @keyframes gradientShift {
+        @gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
@@ -231,7 +231,7 @@
         .budget-item { display: flex; flex-direction: column; gap: 6px; }
         .budget-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.8px; }
         
-        @keyframes inputNeonWaveGreen {
+        @inputNeonWaveGreen {
             0% { border-color: #10b981; box-shadow: 0 0 4px rgba(16,185,129,0.2); }
             50% { border-color: #34d399; box-shadow: 0 0 12px rgba(52,211,153,0.5); }
             100% { border-color: #10b981; box-shadow: 0 0 4px rgba(16,185,129,0.2); }
@@ -2795,7 +2795,7 @@
                                 <td>₹ ${currentGross.toFixed(2)}</td>
                                 <td>₹ ${currentDeductions.toFixed(2)}</td>
                                 <td style="color:var(--success);">₹ ${currentNet.toFixed(2)}</td>
-                                <td><span class="status-badge-ms ms-bg-warning">Processing</span></td>`;
+                                <td><span class="status-badge-ms var(--warning)">Processing</span></td>`;
             } else {
                 let mockMultiplier = 0.85 - (0.05 * (activeIndex - cyclesList.indexOf(cycle))); 
                 if(mockMultiplier < 0.2) mockMultiplier = 0.2;
@@ -3063,7 +3063,11 @@
 
     // 🌐 INTEGRATED LOCAL AND CLOUD SAVE SYSTEM
     async function saveAllData(targetProject = null) {
-        let suffix = targetProject ? '_' + targetProject : getActiveProjectSuffix();
+        let currentActive = localStorage.getItem('rwd_active_project') || 'default';
+        let rawSuffix = targetProject ? targetProject : currentActive;
+        let cleanSuffix = rawSuffix.trim().toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
+        let suffix = cleanSuffix === 'default' ? '' : '_' + cleanSuffix;
+
         let dataObj = {
             workName: document.getElementById('globalWorkName').value,
             bondNo: document.getElementById('globalBondNo').value,
@@ -3136,9 +3140,11 @@
         }
     }
 
-    // ⚡ FIX: CLOUD DATA INJECTION ENGINE
+    // 2. CLOUD DATA INJECTION ENGINE
     async function loadSavedData() {
-        let suffix = getActiveProjectSuffix();
+        let currentActive = localStorage.getItem('rwd_active_project') || 'default';
+        let cleanSuffix = currentActive.trim().toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
+        let suffix = cleanSuffix === 'default' ? '' : '_' + cleanSuffix;
         let dataObj = null;
 
         let badge = document.getElementById('autosaveBadge');
